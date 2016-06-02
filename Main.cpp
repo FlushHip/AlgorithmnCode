@@ -32,7 +32,7 @@ int main()
 		if(!top)
 			puts("0");
 		else
-			printf("%I64d\n",
+			printf("%lld\n",
 				dfs(src,top-1,6-src[top]-des[top])+
 				dfs(des,top-1,6-src[top]-des[top])+
 				1LL);
