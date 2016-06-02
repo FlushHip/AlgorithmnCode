@@ -24,7 +24,7 @@ bool judge(int x)
 	}
 	if(tmp>x)
 		return false;
-	if(top+1==k)
+	if(top+1<=k)
 		return true;
 	return false;
 }
