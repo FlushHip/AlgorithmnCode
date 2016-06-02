@@ -3,4 +3,5 @@
 int main()
 {
 	puts("son of bitch!");
+	puts("go died!");
 }
