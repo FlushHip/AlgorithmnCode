@@ -6,4 +6,5 @@ int main()
 	puts("go died!");
 	for(int i=0;i<5;i++)
 		printf("%d*2=%d\n",i*2);
+	return 0;
 }
