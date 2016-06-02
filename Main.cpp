@@ -1,10 +1,41 @@
 #include <stdio.h>
+#include <string.h>
+
+const int M=64;
+
+typedef long long LL;
+
+int n;
+
+int src[M],des[M];
+
+LL dfs(int a[],int x,int num)
+{
+	if(!x)
+		return 0;
+	if(a[x]==num)
+		return dfs(a,x-1,num);
+	return dfs(a,x-1,6-num-a[x])+(1LL<<(x-1));
+}
 
 int main()
 {
-	puts("son of bitch!");
-	puts("go died!");
-	for(int i=0;i<5;i++)
-		printf("%d*2=%d\n",i*2);
+	int K=1;
+	while(scanf("%d",&n),n){
+		for(int i=1;i<=n;i++)
+			scanf("%d",&des[i]);
+		for(int i=1;i<=n;i++)
+			scanf("%d",&src[i]);
+		int top=n;
+		for(;top>=1&&des[top]==src[top];--top);
+		printf("Case %d: ",K++);
+		if(!top)
+			puts("0");
+		else
+			printf("%I64d\n",
+				dfs(src,top-1,6-src[top]-des[top])+
+				dfs(des,top-1,6-src[top]-des[top])+
+				1LL);
+	}
 	return 0;
 }
