@@ -29,13 +29,28 @@ bool judge(int x)
 	return false;
 }
 
+void print()
+{
+	printf("%d",array[0]);
+	int h=top-1;
+	for(int i=0;i<n;i++){
+		printf(" %d",array[i]);
+		if(h<0)
+			continue;
+		if(i==ans[h])
+			printf(" /"),
+			--h;
+	}
+	puts("");
+}
+
 void work()
 {
-	int l=0;r=sum,mid;
+	int l=0,r=sum,mid;
 	while(l<=r){
 		mid=(l+r)/2;
 		bool f=judge(mid);
-		if(bool)
+		if(f)
 			r=mid;
 		else
 			l=mid+1;
