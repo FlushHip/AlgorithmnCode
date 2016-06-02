@@ -8,38 +8,39 @@ int n,k;
 int array[M];
 int sum;
 
-int ans[M];
+bool ans[M];
 int top;
 
 bool judge(int x)
 {
+	top=0;
+	memset(ans,false,sizeof(ans));
 	int tmp=0;
 	int i=n-1;
-	while(tmp>=0){
+	while(i>=0){
+		if(array[i]>x)
+			return false;
 		if(tmp+array[i]>x)
-			ans[top++]=i;
+			ans[i]=true,
+			++top,
+			tmp=0,
+			++i;
 		else
 			tmp+=array[i];
 		--i;
 	}
-	if(tmp>x)
-		return false;
-	if(top+1<=k)
-		return true;
-	return false;
+	return top+1<=k;
 }
 
 void print()
 {
 	printf("%d",array[0]);
-	int h=top-1;
-	for(int i=0;i<n;i++){
+	if(ans[0])
+		printf(" /");
+	for(int i=1;i<n;i++){
 		printf(" %d",array[i]);
-		if(h<0)
-			continue;
-		if(i==ans[h])
-			printf(" /"),
-			--h;
+		if(ans[i])
+			printf(" /");
 	}
 	puts("");
 }
@@ -47,7 +48,7 @@ void print()
 void work()
 {
 	int l=0,r=sum,mid;
-	while(l<=r){
+	while(l<r){
 		mid=(l+r)/2;
 		bool f=judge(mid);
 		if(f)
@@ -55,6 +56,12 @@ void work()
 		else
 			l=mid+1;
 	}
+	judge(l);
+	
+	for(int i=0;i<n&&top+1<k;i++)
+		if(!ans[i])
+			ans[i]=true,
+			top++;
 }
 
 int main()
@@ -72,3 +79,4 @@ int main()
 	}
 	return 0;
 }
+
