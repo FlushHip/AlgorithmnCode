@@ -8,30 +8,61 @@ int map[M][M];
 
 int row[M];
 
+int States[M][1<<M];
+int top[M];
+
 bool f;
 
-void dfs(int x,int y)
+int judge(int x)
 {
-	if(y==n+1){
-		int sum=0;
-		for(int i=1;i<=n;i++)
-			sum+=map[x][i];
-		if(sum==row[x])
-			dfs(x+1,x+2);
-		return ;
+	int sum=0;
+	while(x){
+		sum+=(x&1);
+		x>>=1;
 	}
+	return sum;
+}
+
+void get_States()
+{
+	memset(top,0,sizeof(top));
+	for(int i=0;i<(1<<n);i++){
+		int tmp=judge(i);
+		States[tmp][top[tmp]++]=i;
+	}
+}
+
+void dfs(int x)
+{
 	if(x==n+1){
 		f=true;
 		return ;
 	}
 	if(f)
 		return ;
-	dfs(x,y+1);
-	if(f)
-		return ;
-	map[x][y]=map[y][x]=1;
-	dfs(x,y+1);
-		
+	for(int i=0;i<top[row[x]];i++){
+		int s=States[row[x]][i];
+		if(s&(1<<(n-x)))
+			continue;
+		int tmp[M]={0};
+		bool h=true;
+		for(int j=n;j>=1&&s;j--,s>>=1)
+			tmp[j]=(s&1);
+		for(int j=1;j<x;j++)
+			if(tmp[j]!=map[x][j]){
+				h=false;
+				break;
+			}
+		if(!h)
+			continue;
+		for(int j=x+1;j<=n;j++)
+			map[x][j]=map[j][x]=tmp[j];
+		dfs(x+1);
+		if(f)
+			return ;
+		for(int j=x+1;j<=n;j++)
+			map[j][x]=0;
+	}
 }
 
 int main()
@@ -43,8 +74,9 @@ int main()
 		for(int i=1;i<=n;i++)
 			scanf("%d",&row[i]);
 		f=false;
+		get_States();
 		memset(map,0,sizeof(map));		
-		dfs(1,2);
+		dfs(1);
 		
 		if(!f)
 			puts("NO");
