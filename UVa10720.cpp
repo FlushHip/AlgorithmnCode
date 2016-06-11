@@ -25,6 +25,7 @@ bool havel()
 
 int main()
 {
+	std::ios::sync_with_stdio(false);
 	while(cin>>n,n){
 		for(int i=0;i<n;i++)
 			cin>>de[i];
