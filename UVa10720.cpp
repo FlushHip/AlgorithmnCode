@@ -1,5 +1,5 @@
 #include <iostream>
-#include <algortithm>
+#include <algorithm>
 
 using namespace std;
 
@@ -17,6 +17,8 @@ bool havel()
 			return false;
 		for(int j=i+1;j<n&&de[i];j++)
 			--de[j],--de[i];
+		if(de[i]>0)
+			return false;
 	}
 	return true;
 }
