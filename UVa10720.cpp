@@ -9,14 +9,24 @@ int n;
 
 int de[M];
 
+bool cmp(int a,int b)
+{
+	return a>b;
+}
+
 bool havel()
 {
 	for(int i=0;i<n;i++){
-		sort(de+i,de+n);
+		sort(de+i,de+n,cmp);
 		if(de[i]<0)
 			return false;
-		for(int j=i+1;j<n&&de[i];j++)
+		if(!de[i])
+			break;
+		for(int j=i+1;j<n&&de[i];j++){
 			--de[j],--de[i];
+			if(de[j]<0)
+				return false;
+		}
 		if(de[i]>0)
 			return false;
 	}
