@@ -36,15 +36,12 @@ public class POJ1837{
 				int pre=que[head++];
 				head%=E;
 
-				System.out.println("pre="+pre+"\npos="+t_pos);
-				
-				if(t_pos==m+1){
-					ans+=(pre==0? 1:0);
-					continue;
-				}
-
 				for(int i=1;i<=n;i++){
 					int tmp=b[t_pos+1]*a[i];
+					if(t_pos+1==m){
+						ans+=((pre+tmp)==0? 1:0);
+						continue;
+					}
 					que[tail]=pre+tmp;
 					pos[tail++]=t_pos+1;
 					tail%=E;
