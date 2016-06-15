@@ -4,7 +4,6 @@
 #include <string>
 #include <algorithm>
 #include <iostream>
-#include <map>
 
 using namespace std;
 
@@ -23,17 +22,23 @@ typedef struct tagNode{
 int n,b;
 
 int top;
+string tag[M];
 
 Node node[M][M];
 int num[M];
 
-map<string,int> has_map;
+bool cmp(Node a,Node b)
+{
+	return a.p<b.p;
+}
 
 int count(string s)
 {
-	if(!has_map.count(s))
-		has_map[s]=top++;
-	return has_map[s];
+	for(int i=0;i<top;i++)
+		if(s==tag[i])
+			return i;
+	tag[top]=s;
+	return top++;
 }
 
 bool judge(int x)
@@ -41,15 +46,14 @@ bool judge(int x)
 	int sum=0;
 	for(int i=0;i<top;i++){
 		bool f=false;
-		int themin=b+10;
 		for(int j=0;j<num[i];j++)
-			if(x<=node[i][j].q&&themin>node[i][j].p){
-				themin=node[i][j].p;
+			if(x<=node[i][j].q){
+				sum+=node[i][j].p;
 				f=true;
+				break;
 			}
 		if(!f)
 			return false;
-		sum+=themin;
 	}
 	return sum<=b;
 }
@@ -61,7 +65,6 @@ int main()
 		
 		memset(num,0,sizeof(num));
 		top=0;
-		has_map.clear();
 		
 		scanf("%d%d",&n,&b);
 		char tmp[35],t[35];
@@ -73,6 +76,8 @@ int main()
 			int pos=count(tmp);
 			node[pos][num[pos]++]=Node(tp,tq);
 		}
+		for(int i=0;i<top;i++)
+			sort(node[i],node[i]+num[i],cmp);
 		
 		int l=1,r=ms,mid=0;
 		while(l<r){
