@@ -81,7 +81,7 @@ int main()
 		
 		int l=1,r=ms,mid=0;
 		while(l<r){
-			mid=(r+l)/2;
+			mid=(r+l+1)/2;
 			bool f=judge(mid);
 			if(f)
 				l=mid;
