@@ -9,7 +9,9 @@ int a[M];
 
 int main()
 {
-	while(~scanf("%d",&n)){
+	int N;
+	for(scanf("%d",&N);N--;){
+		scanf("%d",&n);
 		for(int i=0;i<n;i++)
 			scanf("%d",&a[i]);
 		int tmpmax=a[0];
