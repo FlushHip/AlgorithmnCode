@@ -1,13 +1,13 @@
 import java.util.*;
 
-public class UVa11624 {
+public class Main {
 	Scanner cin = new Scanner(System.in);
 
 	static final int M = 1000 + 25;
-	static final int INF = 10000000;
+	static final int INF = 10000000 + 25;
 
-	static final int[] dirx = new int[] { 0, 0, 1, -1 };
-	static final int[] diry = new int[] { 1, -1, 0, 0 };
+	static final int[] dirx = new int[] { 0, 1, 0, -1 };
+	static final int[] diry = new int[] { -1, 0, 1, 0 };
 
 	int R, C;
 	int X, Y;
@@ -21,13 +21,12 @@ public class UVa11624 {
 	int head, tail;
 
 	void dfs_init(int x, int y, int sum) {
-		fireTime[x][y] = Math.min(sum, fireTime[x][y]);
+		fireTime[x][y] = sum;
 		for (int i = 0; i < 4; i++) {
 			int tx = x + dirx[i];
 			int ty = y + diry[i];
-			if (tx >= 1 && tx <= R && ty >= 1 && ty <= C && !used[tx][ty]
-					&& map[tx][ty] != '#') {
-				used[tx][ty] = true;
+			if (tx >= 1 && tx <= R && ty >= 1 && ty <= C && map[tx][ty] != '#'
+					&& sum + 1 < fireTime[tx][ty]) {
 				dfs_init(tx, ty, sum + 1);
 			}
 		}
@@ -40,16 +39,12 @@ public class UVa11624 {
 		for (int i = 1; i <= R; i++)
 			for (int j = 1; j <= C; j++)
 				if (map[i][j] == 'F') {
-					for (int x = 1; x <= R; x++)
-						for (int y = 1; y <= C; y++)
-							used[x][y] = false;
-					used[i][j] = true;
 					dfs_init(i, j, 0);
 				}
 	}
 
 	int bfs() {
-		if(X == 1 || X == R || Y == 1 || Y == C)
+		if (X == 1 || X == R || Y == 1 || Y == C)
 			return 1;
 		for (int i = 1; i <= R; i++)
 			for (int j = 1; j <= C; j++)
@@ -81,7 +76,7 @@ public class UVa11624 {
 		return -1;
 	}
 
-	UVa11624() {
+	Main() {
 		int N = cin.nextInt();
 		while (N-- > 0) {
 			R = cin.nextInt();
@@ -107,7 +102,7 @@ public class UVa11624 {
 	}
 
 	public static void main(String[] args) {
-		new UVa11624();
+		new Main();
 	}
 }
 
