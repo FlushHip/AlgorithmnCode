@@ -4,7 +4,7 @@ public class Main {
 	Scanner cin = new Scanner(System.in);
 
 	static final int M = 1000 + 25;
-	static final int INF = 10000000 + 25;
+	static final int INF = 1000000 + 25;
 
 	static final int[] dirx = new int[] { 0, 1, 0, -1 };
 	static final int[] diry = new int[] { -1, 0, 1, 0 };
@@ -21,16 +21,22 @@ public class Main {
 	int head, tail;
 
 	void init() {
-		for (int i = 1; i <= R; i++)
-			for (int j = 1; j <= C; j++)
-				fireTime[i][j] = INF;
-		for (int i = 1; i <= R; i++)
-			for (int j = 1; j <= C; j++)
-				if (map[i][j] != '#')
-					for (int k = 0; k < tail; k++)
-						fireTime[i][j] = Math
-								.min(fireTime[i][j], Math.abs(que[k].x - i)
-										+ Math.abs(que[k].y - j));
+		while (head != tail) {
+			Node pre = que[head++];
+			head %= INF;
+			for (int i = 0; i < 4; i++) {
+				int tx = pre.x + dirx[i];
+				int ty = pre.y + diry[i];
+				Node now = new Node(tx, ty, pre.step + 1);
+				if (tx >= 1 && tx <= R && ty >= 1 && ty <= C
+						&& map[tx][ty] != '#' && !used[tx][ty]) {
+					used[tx][ty] = true;
+					fireTime[tx][ty] = now.step;
+					que[tail++] = now;
+					tail %= INF;
+				}
+			}
+		}
 	}
 
 	int bfs() {
@@ -69,7 +75,10 @@ public class Main {
 	Main() {
 		int N = cin.nextInt();
 		while (N-- > 0) {
-			tail = 0;
+			for (int i = 1; i <= R; i++)
+				for (int j = 1; j <= C; j++)
+					used[i][j] = false;
+			head = tail = 0;
 			R = cin.nextInt();
 			C = cin.nextInt();
 			char[] tmpStr = new char[M];
@@ -81,8 +90,11 @@ public class Main {
 						X = i;
 						Y = j;
 					}
-					if (map[i][j] == 'F')
+					if (map[i][j] == 'F') {
+						fireTime[i][j] = 0;
+						used[i][j] = true;
 						que[tail++] = new Node(i, j, 0);
+					}
 
 				}
 			}
