@@ -20,27 +20,17 @@ public class Main {
 	Node[] que = new Node[INF];
 	int head, tail;
 
-	void dfs_init(int x, int y, int sum) {
-		fireTime[x][y] = sum;
-		for (int i = 0; i < 4; i++) {
-			int tx = x + dirx[i];
-			int ty = y + diry[i];
-			if (tx >= 1 && tx <= R && ty >= 1 && ty <= C && map[tx][ty] != '#'
-					&& sum + 1 < fireTime[tx][ty]) {
-				dfs_init(tx, ty, sum + 1);
-			}
-		}
-	}
-
 	void init() {
 		for (int i = 1; i <= R; i++)
 			for (int j = 1; j <= C; j++)
 				fireTime[i][j] = INF;
 		for (int i = 1; i <= R; i++)
 			for (int j = 1; j <= C; j++)
-				if (map[i][j] == 'F') {
-					dfs_init(i, j, 0);
-				}
+				if (map[i][j] != '#')
+					for (int k = 0; k < tail; k++)
+						fireTime[i][j] = Math
+								.min(fireTime[i][j], Math.abs(que[k].x - i)
+										+ Math.abs(que[k].y - j));
 	}
 
 	int bfs() {
@@ -79,6 +69,7 @@ public class Main {
 	Main() {
 		int N = cin.nextInt();
 		while (N-- > 0) {
+			tail = 0;
 			R = cin.nextInt();
 			C = cin.nextInt();
 			char[] tmpStr = new char[M];
@@ -90,6 +81,9 @@ public class Main {
 						X = i;
 						Y = j;
 					}
+					if (map[i][j] == 'F')
+						que[tail++] = new Node(i, j, 0);
+
 				}
 			}
 			init();
