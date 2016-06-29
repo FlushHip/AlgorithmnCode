@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 #define MAX(a,b) ((a)>(b)? (a):(b))
 #define MIN(a,b) ((a)<(b)? (a):(b))
@@ -28,7 +29,6 @@ double dis2(Point a,Point b)
 
 double dij(int src)
 {
-	double ans=0;
 	int i,j;
 	for(i=1;i<=n;i++)
 		dis[i]=INF,used[i]=false;
@@ -42,10 +42,11 @@ double dij(int src)
 		used[pos]=true;
 		for(j=1;j<=n;j++)
 			if(!used[j]){
-				ans=MAX(ans,map[pos][j]);
-				dis[j]=MIN(dis[pos]+map[pos][j],dis[j]);
+				double ans=MAX(dis[pos],map[pos][j]);
+				dis[j]=MIN(ans,dis[j]);
 			}
 	}
+	return dis[2];
 }
 
 int main()
@@ -56,7 +57,8 @@ int main()
 		int x,y;
 		for(i=1;i<=n;i++){
 			scanf("%d%d",&x,&y);
-			points[i]=Node(x,y);
+			points[i].x=x;
+			points[i].y=y;
 		}
 		for(i=1;i<=n;i++)
 			for(j=i;j<=n;j++)
