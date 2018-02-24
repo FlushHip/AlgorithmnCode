@@ -86,7 +86,7 @@ int main()
         int x, y, val;
         scanf("%d%d", &n, &m);
 
-	    // any num
+	// any num
         int root = 1;
 
         memset(head, -1, sizeof(head));
