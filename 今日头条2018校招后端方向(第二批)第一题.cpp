@@ -45,7 +45,7 @@ int main()
 			scanf("%d%d%d", &L, &R, &k);
 			pair<vector<pair<int, int> >::iterator, vector<pair<int, int> >::iterator> sd =
 				equal_range(arr.begin(), arr.end(), k, find_first_cmp());
-            printf("%d\n", upper_bound(sd.first, sd.second, L, find_second_cmp()) -
+        		printf("%d\n", upper_bound(sd.first, sd.second, L, find_second_cmp()) -
 				 lower_bound(sd.first, sd.second, R, find_second_cmp()));
 		}
 	}
