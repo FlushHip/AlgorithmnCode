@@ -57,6 +57,6 @@ int main()
 			}
         }
         cout << (ans ? "yes" : "no") << endl;
-    }
+	}
 	return 0;
 }
