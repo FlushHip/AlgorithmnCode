@@ -28,17 +28,17 @@ void getabc(int i, LL a, LL *pb, LL *pc, LL d1, LL d2)
 
 int main()
 {
-    int T;
-    for (cin >> T; T--; ) {
+	int T;
+	for (cin >> T; T--; ) {
 		LL n, k, d1, d2;
 		scanf("%lld%lld%lld%lld", &n, &k, &d1, &d2);
 
 		LL x[] = {k - 2 * d1 - d2,
-					k - 2 * d1 + d2,
-					k + 2 * d1 - d2,
-					k + 2 * d1 + d2};
-        bool ans = false;
-        for (int i = 0; i < 4; i++) {
+				k - 2 * d1 + d2,
+				k + 2 * d1 - d2,
+				k + 2 * d1 + d2};
+		bool ans = false;
+		for (int i = 0; i < 4; i++) {
 			int sum = 0;
 			for (LL t = x[i]; t; sum += t % 10, t /= 10) {}
 
@@ -55,8 +55,8 @@ int main()
 					}
 				}
 			}
-        }
-        cout << (ans ? "yes" : "no") << endl;
+		}
+		cout << (ans ? "yes" : "no") << endl;
 	}
 	return 0;
 }
