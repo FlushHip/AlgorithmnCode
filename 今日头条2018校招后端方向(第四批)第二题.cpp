@@ -9,19 +9,21 @@ int main()
     for (; cin >> n >> m >> s; ) {
         int ans = 0;
         for (char c = 'a'; c < 'c'; ++c) {
-            vector<vector<int> > dp(2, vector<int>(s.size(), 0));
-            int ret = 1;
-            for (int i = 0; i < (int)s.size(); ++i)
-                dp[1][i] = s[i] != c;
-            for (int len = 2; len <= (int)s.size(); ++len) {
-                for (int i = 0; i + len - 1 < (int)s.size(); i++) {
-                    dp[len % 2][i] = max((dp[(len - 1) % 2][i] + (s[i + len - 1] != c)),
-                                         (dp[(len - 1) % 2][i + 1] + (s[i] != c)));
-                    if (dp[len % 2][i] <= m)
-                        ret = len;
-                }
+            vector<int> dp(s.size() + 1, 0);
+            for (int i = 1; i <= (int)s.size(); ++i)
+                dp[i] = dp[i - 1] + (s[i - 1] == c);
+            int l = -1, r = (int)s.size() - 1;
+            while (l < r) {
+                int mid = (l + r + 1) / 2;
+                bool f = false;
+                for (int i = 0; i + mid - 1 < (int)s.size(); i++)
+                    if (dp[i + mid] - dp[i] <= m) {
+                        f = true;
+                        break;
+                    }
+                f ? l = mid : r = mid - 1;
             }
-            ans = max(ans, ret);
+            ans = max(ans, r);
         }
         cout << ans << endl;
     }
