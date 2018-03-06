@@ -50,7 +50,7 @@ int main()
                 LL a = x[i] / 3, b, c;
                 getabc(i, a, &b, &c, d1, d2);
 
-                if (0 <= b && b <= min(k, n / 3) && 0 <= c && b <= min(k, n / 3)) {
+                if (0 <= b && b <= min(k, n / 3) && 0 <= c && c <= min(k, n / 3)) {
                     ans = true;
                     break;
                 }
