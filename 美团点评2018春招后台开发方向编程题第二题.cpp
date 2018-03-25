@@ -13,7 +13,7 @@ int main()
 			if (theMin > used[i])
 				theMin = used[i], digit = i;
 		if (used[0] + 1 <= theMin)
-			cout << "1" + string(theMin, '0') << endl;
+			cout << "1" + string(used[0] + 1, '0') << endl;
 		else
 			cout << string(theMin + 1, digit + '0') << endl;
 	}
