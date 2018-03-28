@@ -574,3 +574,322 @@ int main()
 }
 
 ```
+
+# 代码JAVA实现
+
+JAVA的代码和C++的代码差不多，最大的区别就是JAVA中没有`lower_bound`，`upper_bound`，这是STL中的两个二分求上下界函数，自己手动实现一下就好了，可以参考[你真的理解二分的写法吗 - 二分写法详解](https://blog.csdn.net/flushhip/article/details/79261608)。
+
+## 牛牛找工作
+
+```Java
+import java.util.*;
+
+public class Main {
+
+	public static Scanner cin = new Scanner(System.in);
+
+	public static int upper_bound(Pair[] arr, int begin, int end, int tag) {
+		--begin;
+		--end;
+		while (begin < end) {
+			int mid = (begin + end + 1) / 2;
+			if (arr[mid].first > tag)
+				end = mid - 1;
+			else
+				begin = mid;
+		}
+		return end + 1;
+	}
+
+	public static void main(String[] args) {
+		while (cin.hasNext()) {
+			int n = cin.nextInt(), m = cin.nextInt();
+			Pair[] arr = new Pair[n];
+			for (int i = 0; i < n; i++)
+				arr[i] = new Pair(cin.nextInt(), cin.nextInt());
+			Arrays.sort(arr, new Comparator<Pair>() {
+				@Override
+				public int compare(Pair arg0, Pair arg1) {
+					return arg0.first - arg1.first;
+				}
+			});
+			int[] ans = new int[n];
+			ans[0] = arr[0].second;
+			for (int i = 1; i < arr.length; ans[i] = Math.max(ans[i - 1],
+					arr[i].second), ++i) {
+			}
+			while (m-- > 0) {
+				int index = upper_bound(arr, 0, arr.length, cin.nextInt());
+				System.out.println(index == 0 ? 0 : ans[index - 1]);
+			}
+		}
+	}
+}
+
+class Pair {
+	public int first;
+	public int second;
+
+	Pair() {
+	}
+
+	Pair(int first, int second) {
+		this.first = first;
+		this.second = second;
+	}
+}
+```
+
+## 被3整除
+```Java
+import java.util.*;
+
+public class Main {
+
+	public static Scanner cin = new Scanner(System.in);
+
+	public static int fun(int x) {
+		return x / 3 * 2 + (x % 3 == 0 ? 0 : x % 3 == 1 ? 0 : 1);
+	}
+
+	public static void main(String[] args) {
+		while (cin.hasNext()) {
+			int l = cin.nextInt(), r = cin.nextInt();
+			System.out.println(fun(r) - fun(l - 1));
+		}
+	}
+}
+```
+
+## 安置路灯
+```Java
+import java.util.*;
+
+public class Main {
+
+	public static Scanner cin = new Scanner(System.in);
+
+	public static void main(String[] args) {
+		for (int T = cin.nextInt(); T-- > 0;) {
+			int n = cin.nextInt(), ans = 0;
+			String str = cin.next();
+			for (int i = 0; i < str.length();) {
+				for (; i < str.length() && str.charAt(i) == 'X'; ++i) {
+				}
+				for (; i < str.length() && str.charAt(i) == '.'; ++ans, i += 3) {
+				}
+			}
+			System.out.println(ans);
+		}
+	}
+
+}
+```
+
+## 迷路的牛牛
+```Java
+import java.util.*;
+
+public class Main {
+
+	public static Scanner cin = new Scanner(System.in);
+
+	public static void main(String[] args) {
+		String DIR = "NESW";
+		while (cin.hasNext()) {
+			int n = cin.nextInt();
+			String str = cin.next();
+			int ans = 0;
+			for (int i = 0; i < n; i++)
+				ans = (ans + (str.charAt(i) == 'L' ? -1 : 1) + 4) % 4;
+			System.out.println(DIR.charAt(ans % 4));
+		}
+	}
+}
+```
+
+## 数对
+```Java
+import java.util.*;
+
+public class Main {
+
+	public static Scanner cin = new Scanner(System.in);
+
+	public static void main(String[] args) {
+		while (cin.hasNext()) {
+			long n = cin.nextLong(), k = cin.nextLong(), ans = 0;
+			if (k == 0)
+				ans = n * n;
+			else
+				for (long y = k + 1; y <= n; y++)
+					ans += n / y * (y - k) + (n % y >= k ? n % y - k + 1 : 0);
+			System.out.println(ans);
+		}
+	}
+
+}
+```
+## 矩形重叠
+```Java
+import java.util.*;
+
+public class Main {
+
+	public static Scanner cin = new Scanner(System.in);
+
+	public static int lower_bound(int[] arr, int begin, int end, int tag) {
+		while (begin < end) {
+			int mid = (begin + end) / 2;
+			if (arr[mid] < tag)
+				begin = mid + 1;
+			else
+				end = mid;
+		}
+		return begin;
+	}
+
+	public static boolean judge(Rect rect, int x, int y) {
+		return rect.x[0] < x && x < rect.x[2] && rect.x[1] < y && y < rect.x[3];
+	}
+
+	public static void main(String[] args) {
+		while (cin.hasNext()) {
+			int n = cin.nextInt();
+			Rect[] rects = new Rect[n];
+			int[] approch_x = new int[n << 1], approch_y = new int[n << 1];
+			for (int i = 0; i < n; rects[i++] = new Rect()) {
+			}
+
+			for (int i = 0; i < n; approch_x[i] = rects[i].x[0] = cin.nextInt(), ++i) {
+			}
+			for (int i = 0; i < n; approch_y[i] = rects[i].x[1] = cin.nextInt(), ++i) {
+			}
+			for (int i = 0; i < n; approch_x[n + i] = rects[i].x[2] = cin.nextInt(), ++i) {
+			}
+			for (int i = 0; i < n; approch_y[n + i] = rects[i].x[3] = cin.nextInt(), ++i) {
+			}
+			Arrays.sort(approch_x);
+			Arrays.sort(approch_y);
+			for (int i = 0; i < n; i++) {
+				for (int j = 0; j < 4; j++) {
+					if (j % 2 == 0)
+						rects[i].x[j] = 2 * lower_bound(approch_x, 0, n << 1,
+								rects[i].x[j]);
+					else
+						rects[i].x[j] = 2 * lower_bound(approch_y, 0, n << 1,
+								rects[i].x[j]);
+				}
+			}
+			int col = 2 * lower_bound(approch_x, 0, n << 1,
+					approch_x[2 * n - 1]);
+			int row = 2 * lower_bound(approch_y, 0, n << 1,
+					approch_y[2 * n - 1]);
+
+			int ans = 1;
+			for (int i = 0; i + 2 < row; i += 2) {
+				for (int j = 0; j + 2 < col; j += 2) {
+					int sum = 0;
+					for (int k = 0; k < n; k++)
+						sum += judge(rects[k], i + 1, j + 1) ? 1 : 0;
+					ans = Math.max(ans, sum);
+				}
+			}
+			System.out.println(ans);
+		}
+	}
+}
+
+class Rect {
+	int[] x;
+
+	Rect() {
+		x = new int[4];
+	}
+}
+```
+
+## 牛牛的闹钟
+```Java
+import java.util.*;
+
+public class Main {
+
+	public static Scanner cin = new Scanner(System.in);
+
+	public static int lower_bound(int[] arr, int begin, int end, long tag) {
+		while (begin < end) {
+			int mid = (begin + end) / 2;
+			if (arr[mid] < tag)
+				begin = mid + 1;
+			else
+				end = mid;
+		}
+		return begin;
+	}
+
+	public static void main(String[] args) {
+		while (cin.hasNext()) {
+			int n = cin.nextInt();
+			int[] arr = new int[n];
+			for (int i = 0; i < n; arr[i++] = cin.nextInt() * 60
+					+ cin.nextInt()) {
+			}
+			Arrays.sort(arr);
+			int x = cin.nextInt();
+			int index = lower_bound(arr, 0, n,
+					cin.nextInt() * 60 + cin.nextInt() - x + 1) - 1;
+			System.out.println(arr[index] / 60 + " " + arr[index] % 60);
+		}
+	}
+}
+```
+
+## 牛牛的背包问题
+```Java
+import java.util.*;
+
+public class Main {
+
+	public static Scanner cin = new Scanner(System.in);
+
+	public static int lower_bound(long[] arr, int begin, int end, long tag) {
+		while (begin < end) {
+			int mid = (begin + end) / 2;
+			if (arr[mid] < tag)
+				begin = mid + 1;
+			else
+				end = mid;
+		}
+		return begin;
+	}
+
+	public static void main(String[] args) {
+		while (cin.hasNext()) {
+			long n = cin.nextLong(), w = cin.nextLong();
+			long[] v = new long[(int) n];
+			for (int i = 0; i < n; v[i++] = cin.nextLong()) {
+			}
+			long n1 = n >> 1, n2 = n - n1;
+			long[] arr = new long[1 << n1];
+			for (int i = 0; i < (1 << n1); i++) {
+				long sum = 0;
+				for (int bits = 0; bits < n1; bits++)
+					sum += (long) (((i & (1 << bits)) != 0) ? v[bits] : 0);
+				arr[i] = sum;
+			}
+			Arrays.sort(arr);
+
+			long ans = 0;
+			for (int i = 0; i < (1 << n2); i++) {
+				long sum = 0;
+				for (int bits = 0; bits < n2; bits++)
+					sum += (long) (((i & (1 << bits)) != 0) ? v[(int) n1 + bits]
+							: 0);
+				ans += lower_bound(arr, 0, arr.length, w - sum + 1);
+			}
+			System.out.println(ans);
+		}
+	}
+}
+```
