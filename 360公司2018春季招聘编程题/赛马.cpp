@@ -11,7 +11,7 @@ int main()
 		vector<int> arr;
 		for (int i = 0, x; i < n << 1; cin >> x, arr.push_back(x), ++i) {}
 		sort(arr.begin(), arr.end());
-		cout << (arr[n - 1] != arr[n] ? "YES" : "NO") << endl;
+		cout << (arr[n / 2 - 1] != arr[n / 2] ? "YES" : "NO") << endl;
 	}
 	return 0;
 }
