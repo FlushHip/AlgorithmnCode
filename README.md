@@ -1,4 +1,5 @@
 # AlgorithmnCode
-Learning how to use git, And saved same Algorithmn Code
 
-more：visit the blog：http://blog.csdn.net/FlushHip
+Save some algorithmn Code, interview Code And experiment Code.
+
+More detail：visit the blog：https://blog.csdn.net/FlushHip
