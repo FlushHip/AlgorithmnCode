@@ -351,3 +351,37 @@ process(ptr, priority());
 process(std::make_shared<Widget>(), priority());
 ```
 
+## 设计与声明
+
+### 让接口容易被正确使用，不易被误用
+
+“**cross-DLL problem**”：对象在一个DLL中`new`出来，却在另一个DLL中被`delete`。由于C++的不同实现差异，不配对的`new`和`delete`一起使用可能会导致奔溃，而只能指针避免了这一问题，它把`new`和`delete`都绑定到了一个DLL中，使用同一份C++实现；同时，智能指针都是支持定制删除器的。
+
+促进正确使用：要保证**接口的一致性**，以及**与内置类型的行为兼容**。
+
+### 设计class犹如设计type
+
+### 宁以pass-by-reference-to-const替换pass-by-value
+
+”只能看，不能动“，同类型思想：`std::string_view`等等。
+
+引用在汇编层面是以指针形式实现的，因此，**引用和指针都可以实现多态**。
+
+```assembly
+    int number = 1;
+00F5B81A  mov         dword ptr [number],1  
+    int* point = &number;
+00F5B821  lea         eax,[number]  
+00F5B824  mov         dword ptr [point],eax  
+    int& reference = number;
+00F5B827  lea         eax,[number]  
+00F5B82A  mov         dword ptr [reference],eax  
+```
+
+**内置类型**和**STL中的各种迭代器、函数对象**使用pass-by-value比较好。
+
+### 必须返回对象时，别妄想返回其reference
+
+这个很好理解，凡是引用必有指代之物，如果范围值是引用，那么这个引用指谁呢？函数内的临时变量？不行，函数一结束，栈内存就释放了；堆内存？也不行，堆内存如何释放又是个问题；local-static对象？除非你在写单例！
+
+### 将成员变量声明为`private`
