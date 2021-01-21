@@ -204,7 +204,7 @@ public:
 
 在析构函数中，对有可能发生异常的代码要进行捕获，然后**吞下**或者**结束程序**。
 
-### 绝不在构造或者析构过程中调用`virtaul`函数
+### 绝不在构造或者析构过程中调用`virtual`函数
 
 **构造和析构过程之中虚函数机制失去了作用**，在基类的构造过程中，派生类还没有构造，如果这个时候调用虚函数，虚函数中使用了派生类特有的变量，那么这个行为就危险了。因此，编译器会让虚函数机制在构造和析构过程中失去作用。
 
@@ -253,3 +253,101 @@ basic_ostream& operator<<(const void *val) {
 ```
 
 ### 在`operator=`中处理“自我赋值”
+
+### 复制对象时勿忘其每一个成分
+
+如果你为class添加一个成员变量，那么你必须同时修改拷贝构造函数。
+
+如果你为派生类编写拷贝构造函数和拷贝赋值构造函数，那么一定要调用基类对应的相关函数，切记！！！
+
+## 资源管理
+
+异常、函数内多重返回路径等等导致资源管理困难重重。
+
+### 以对象管理资源
+
+进入一个区域，对象的构造函数执行；离开区域，对象的析构函数执行。**资源取得的时机便是初始化的时机——RAII**
+
+```cpp
+std::shared_ptr;
+std::unique_ptr;
+std::lock_guard;
+std::unique_lock;
+```
+
+### 在资源管理类中小心copying行为
+
+- 禁止复制
+- 对底层资源做引用计数
+- 复制底层资源
+- 转移底层资源
+
+### 在资源管理类中提供对原始资源的访问
+
+提供一个访问原始资源的接口，这主要是面对那些C语言的API，这样要显示调用这个接口才能获得原始资源，如果你能确定在使用裸指针的API中不会破坏资源的释放情况，那么你可以使用。
+
+当然，也可以提供隐式转换接口，这样会比较方便客户，但是会增加程序出错的机会。
+
+```cpp
+std::shared_ptr<int>::get();
+
+template <typename T>
+class AutoPtr {
+public:
+    explicit AutoPtr(T* p) : ptr(p) {}
+    explicit AutoPtr(nullptr_t = nullptr) {}
+    operator T* () const {
+        return ptr.get();
+    }
+private:
+    std::shared_ptr<T> ptr;
+};
+
+template <typename T>
+void print(const T* ptr)
+{
+    std::cout << ptr << std::endl;
+}
+
+{
+    AutoPtr<int> ptr(new int{5});
+    print<int>(ptr);
+}
+```
+
+### 成对使用`new`和`delete`要采用相同形式
+
+```cpp
+std::string *stringPtr1 = new std::string;
+std::string *stringPtr2 = new std::string[10];
+
+delete stringPtr1;
+delete[] stringPtr2;
+```
+
+如果对`stringPtr2`调用`delete`，那么数组对象的内存不会泄漏，而每个对象的堆内存会发生泄漏，因为，`delete`只会执行一次析构函数。
+
+因此，不要对数组形式的变量进行`typedef`。
+
+### 以独立语句将newed对象置入智能指针
+
+需要保证`new`和`std::shared_ptr`构造的连续性，因此，这两部分单独成一条语句，避免其余操作因**编译器优化**而插入到这两部分之中，破坏“原子性”。如果这两部分不能连续，那么很可能就会造成资源泄漏。
+
+```cpp
+int priority();
+void process(std::shared_ptr<Widget> w, int prior);
+
+process(std::shared_ptr(new Widget), priority());
+// 1. new Widget
+// 2. priority() , 抛出异常，函数返回
+// 3. std::shared_ptr构造，根本没有机会执行
+
+// 解决方法
+// - 1
+std::shared_ptr<Widget> ptr(new Widget);
+process(ptr, priority());
+
+// - 2
+process(std::make_shared<Widget>(), priority());
+```
+
