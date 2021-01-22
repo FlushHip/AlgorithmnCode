@@ -204,6 +204,8 @@ public:
 
 在析构函数中，对有可能发生异常的代码要进行捕获，然后**吞下**或者**结束程序**。
 
+万幸的是，C++11已经默认把类的析构函数加上了`noexcept`了。这意味着，析构函数一旦抛出异常，那么程序马上结束，`try-catch`都没有用，所以啊，新的标准已经考虑到了这一点。而且，如果你不需要新标准帮你考虑这一点，那么只需要在析构函数后面加上`noexcept(false)`就可以了。
+
 ### 绝不在构造或者析构过程中调用`virtual`函数
 
 **构造和析构过程之中虚函数机制失去了作用**，在基类的构造过程中，派生类还没有构造，如果这个时候调用虚函数，虚函数中使用了派生类特有的变量，那么这个行为就危险了。因此，编译器会让虚函数机制在构造和析构过程中失去作用。
@@ -385,3 +387,167 @@ process(std::make_shared<Widget>(), priority());
 这个很好理解，凡是引用必有指代之物，如果范围值是引用，那么这个引用指谁呢？函数内的临时变量？不行，函数一结束，栈内存就释放了；堆内存？也不行，堆内存如何释放又是个问题；local-static对象？除非你在写单例！
 
 ### 将成员变量声明为`private`
+
+这里强调了封装性，所有成员变量必须是`private`。其实最好的封装性实现应该是**pImpl**，如果提供一个类给用户用，那么类的头文件是要给到用户的，这样，用户其实是可以看到你的`private`，这样有两点不好：
+
+- 用户可以根据成员变量猜测函数的具体实现
+- 如果用户发现你实现的这个类有bug，你通过添加一个成员变量解决了这个bug，如果用户正确使用了你提供的新的头文件，那么用户用到这个类的地方的代码就要重新编译（重新计算类的大小）；如果用户还是使用旧的文件，程序就有可能奔溃了（实现中使用了新的成员变量，而分配内存的时候就没有给新的成员变量分配）。
+
+`pImpl`刚好解决这个问题。
+
+```cpp
+// app.h
+// 这是给到用户的头文件
+class App {
+    App();
+    void define_option();
+private:
+    class Impl;
+    std::unique_ptr<Impl> impl_;
+};
+
+// app.cpp
+#include "app.h"
+#include "app_impl.h"
+App::App() : impl_(std::make_unique<Impl>()) {}
+void App::define_option() { impl_->define_option(); }
+
+// app_impl.h
+class App::Impl {
+    void define_option();
+private:
+    std::vector<Param> params_;
+};
+
+// app_impl.cpp
+#include "app_impl.h"
+void App::Impl::define_option() { ... }
+```
+
+这是较复杂的实现方法了，用到了设计模式中的**桥模式**，实现和接口可以同步扩展而不影响，简单的实现如下：只需要把所有的成员变量塞入一个结构体中，然后类只需要持有这个结构体的指针，然后在实现中再定义这个结构体。
+
+```cpp
+// app.h
+// 这是给到用户的头文件
+class App {
+    App();
+    void define_option();
+private:
+    struct Impl;
+    std::unique_ptr<Impl> impl_;
+};
+
+// app.cpp
+struct App::Impl {
+	std::vector<Param> params_;
+};
+App::App() : impl_(std::make_unique<Impl>()) {}
+void App::define_option() { /* params_... */ }
+```
+
+### 宁以non-member、non-friend替换member函数
+
+```cpp
+class C {
+public:
+    int get_a() const;
+    int get_b() const;
+    int get_c() const;
+    
+    // 组合
+    std::pair<int, int> get_a_b() const;
+    // ...
+private:
+    int a, b, c;
+};
+```
+
+我需要`a`和`b`你就提供了一个`get_a_b`给我，那我只需要一个`a`呢？是不是我调用`get_a_b().first`？这样真的不灵活，导致类的代码臃肿且不灵活。正确做法就是只提供`get_a, get_b, get_c`这几个基本的函数，你需要`a, b, c`那你自己去写这个函数啊。
+
+```cpp
+// core文件夹
+namespace hestia {
+namespace core {
+
+std::tuple<int, int, int> GetCofABC(const C & c)
+{
+    return std::make_tuple(c.get_a(), c.get_b(), c.get_c());
+}
+
+}
+}
+
+// string文件夹
+namespace hestia {
+namespace string {
+    
+std::pair<int, int> GetCofBC(const C & c)
+{
+    return std::make_pair(c.get_b(), c.get_c());
+}
+
+}
+}
+```
+
+利用`namespace`的可分割性，来定制众多功能函数，同时`namesapce`的嵌套可以做到划分种类的作用。
+
+### 若所有参数皆需要类型转换，请为此采用non-member函数
+
+参考`<<`的重载函数。
+
+### 考虑写出一个不抛异常的`swap`函数
+
+- [ ] ADL [argument-dependent looup](https://en.cppreference.com/w/cpp/language/adl)
+
+默认`swap`的效率对有pImpl的对象的效率是不高的，因此需要改进。
+
+- 提供一个`public`的`swap`成员函数，这个函数**不能抛出异常**（具体原因不详）`noexcept`
+- 在你的`class`或`template`所在命名空间内提供一个non-member的`swap`，并在其中调用上述`swap`成员函数
+- 如果有可能，为你的`class`特化`std::swap`（一般不这么做），不要在`std`命名空间中加东西
+- 最后，利用ADL，调用`swap`时请**裸调用**，并在添加`using std::swap`。
+
+## 实现
+
+### 尽可能延后变量定义式的出现时间
+
+### 尽量少做转型动作
+
+使用C++的新式转型。
+
+- `static_cast`
+- `reinterpret_cast`
+-  `const_cast`
+- `dynamic_cast`
+
+### 避免返回handles指向对象内部成分
+
+如果这样做了，用户可以用过引用或指针来修改对象内的成分，破坏封装性；而且，如果把返回的引用或指针存起来，不立刻使用，那么可能面对对象的生命周期提前结束，导致引用或指针悬挂的问题。
+
+### 为“异常安全”而努力是值得的
+
+移动构造和移动赋值构造，析构，`swap`后加`noexcept`足够了。
+
+保证“异常安全”的一个做法就是**拷贝然后交换**，这个做法保证了**在没有完全修改完之前，所有的一切操作都发生在副本上；当完全修改完之后，一瞬间就把副本和源对象交换**。这样确实可以保证异常安全。说到底，就是要尽可能**保证原子性**，软件世界中要用**一元论**衡量。
+
+由于**新标准**的到来，指针都使用智能指针`std::shared_ptr`，由于**并发**的存在，尽量使用原子变量`std::atomic`。而`std::atomic<std::shared_ptr<T>>`要在C++20才支持，所幸的是C++11提供了**`std::atomic_store`**，如果要完成交换，可以这么做。
+
+```cpp
+class Config {
+public:
+    Config() : image_(std::make_shared<Image>()) {
+        // image ...
+    }
+    
+    void update() {
+        auto image = std::make_shared<Image>();	// 拷贝，副本操作
+        // image ...
+        std::atomic_store(&image_, image);		// 交换赋值，异常安全
+    }
+private:
+    std::shared_ptr<Image> image_;
+}
+```
+
+### 透彻了解inlining的里里外外
+
