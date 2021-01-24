@@ -656,3 +656,61 @@ it->log("drived");
 it->Transaction::log("base");
 ```
 
+### 考虑`virtual`函数以外的选择
+
+## 定制`new`和`delete`
+
+## 杂项讨论
+
+### 不要轻忽编译器的警告
+
+### 让自己熟悉包括TR1在内的标准程序库
+
+现在更应该叫`experimental`。
+
+> The C++ standards committee publishes experimental C++ language and library extensions for future standardization.
+>
+> Note: until 2012, these publications used the TR (technical report) format. Since 2012 ISO procedure changed to use the TS (technical specification) format.
+
+假设你现在的编译器标准是C++14，然后你想用`filesystem`。而在C++14中只有`std::experimental`空间中定义了`filesystem`。假设你的编译器以后可能会升级到C++17，17中`std`中就有`filesystem`了。怎么写你的代码使得编译器升级你的代码改动最小。
+
+有两种办法，第一，把利用ADL，这个方法不推荐，会污染`std`命名空间。
+
+```cpp
+namespace std {
+#if __cplusplus < 201703L
+	using experimental;
+#endif
+}
+
+auto path = std::filesystem::u8path();
+```
+
+第二，自己搞一个`namespace`。
+
+```cpp
+namespace lib {
+#if __cplusplus < 201703L
+    using std;
+#else
+    using std::experimental;
+#endif
+}
+
+auto path = lib::filesystem::u8path();
+```
+
+GNU的`ext/rope`，`ext/pb_ds` [Policy-Based Data Structures](https://gcc.gnu.org/onlinedocs/libstdc++/ext/pb_ds/) 这些都要了解下。
+
+### 让自己熟悉Boost
+
+```cpp
+#include <boost/lambda/lambda.hpp>
+
+int sum = 0;
+std::vector<int> arr = { 1, 2, 3, 4 };
+
+std::for_each(
+    std::begin(arr), std::end(arr), sum += boost::lambda::_1);
+```
+
