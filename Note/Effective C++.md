@@ -553,3 +553,106 @@ private:
 
 ### 透彻了解inlining的里里外外
 
+`inline`只是对编译器的劝告，至于编译器如何实现就不得而知了。定义在类中的函数默认都是`inline`。
+
+`inline`函数无法随着程序库的升级而升级。
+
+Visual Studio的Debug配置是禁用`inline`的，也就是不做任何优化，这样便于调试，便于在`inline`函数中加入断点，那么这就引出了该为`inline`函数的原则：**函数很简单**，通常是一条简单的语句。
+
+一句话缺点：`inline`不便于**调试**和**二进制升级**。
+
+### 将文件间的编译依存关系降至最低
+
+Handle class：**接口和实现分离**，编译防火墙技术`pImpl`。
+
+如果头文件中只有接口，那么建议是`#include <...>`；如果头文件中不仅只有接口还有实现，建议**前置声明**。
+
+Interface class：**纯虚函数加工厂模式**
+
+## 继承与面向对象设计
+
+### 确定你的`public`继承塑模出is-a关系
+
+### 避免遮掩继承而来的名称
+
+基类重载了函数（虚函数或者普通函数），`public`继承下，派生类有同名函数，派生类同样会屏蔽其余的重载函数。
+
+```cpp
+class Base {
+public:
+    void fun_normal() {}
+    void fun_normal(int) {}
+    virtual void fun_virtual() {}
+    virtual void fun_virtual(int) {}
+};
+
+class Drived : public Base {
+public:
+    void fun_normal() {}
+    virtual void fun_virtual() override {}
+	
+    // -- 1
+    // using Base::fun_normal;
+    // using Base::fun_virtual;
+	
+    // -- 2
+    // void fun_normal(int v) { Base::fun_normal(v); }
+    // virtual void fun_virtual(int v) override { Base::fun_virtual(v); }
+};
+
+auto pb = new Drived;
+pb->fun_normal();
+pb->fun_normal(0);          // error C2660: “Drived::fun_normal”: 函数不接受 1 个参数
+pb->fun_virtual();
+pb->fun_virtual(0);         // error C2660: “Drived::fun_virtual”: 函数不接受 1 个参数
+
+// -- 3
+pb->Base::fun_normal(0);
+pb->Base::fun_virtual(0);
+```
+
+上诉三种方法可以解决这个遮蔽的问题，但是实际开发中要避免遮掩继承来的名称
+
+1. 使用`using`
+2. 转发函数，间接调用
+3. 指定类空间，显示调用
+
+### 区分接口继承和实现继承
+
+- 纯虚函数**只是接口继承**
+- 非纯虚虚函数继承了接口和**缺省实现继承**
+- 非虚函数继承了接口和**强制性实现继承**
+
+```cpp
+// 接口继承和缺省实现继承分离：纯虚函数实现
+class Transaction {
+public:
+    Transaction() {
+    }
+    ~Transaction() {
+    }
+    virtual void log(const std::string &str) const = 0;
+};
+
+void Transaction::log(const std::string &str) const             // 默认函数实现
+{
+    std::cout << this << " base log | " << str << std::endl;
+}
+
+class BuyTransaction : public Transaction {
+public:
+    BuyTransaction() = default;
+    virtual void log(const std::string &str) const override;    // 必须实现接口
+};
+
+void BuyTransaction::log(const std::string &str) const
+{
+    Transaction::log(str);
+    std::cout << this << " drived log | " << str << std::endl;
+}
+
+Transaction *it = new BuyTransaction;
+it->log("drived");
+it->Transaction::log("base");
+```
+
