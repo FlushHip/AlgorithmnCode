@@ -504,7 +504,7 @@ std::pair<int, int> GetCofBC(const C & c)
 
 默认`swap`的效率对有pImpl的对象的效率是不高的，因此需要改进。
 
-- 提供一个`public`的`swap`成员函数，这个函数**不能抛出异常**（具体原因不详）`noexcept`
+- 提供一个`public`的`swap`成员函数，这个函数**不能抛出异常**（最基本的函数了，保证异常安全，STL，只能指针这些类都会实现`swap`函数）`noexcept`
 - 在你的`class`或`template`所在命名空间内提供一个non-member的`swap`，并在其中调用上述`swap`成员函数
 - 如果有可能，为你的`class`特化`std::swap`（一般不这么做），不要在`std`命名空间中加东西
 - 最后，利用ADL，调用`swap`时请**裸调用**，并在添加`using std::swap`。
