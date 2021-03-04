@@ -6,19 +6,19 @@
 
 ```sh
 examples
-  	|- base
-  		|- string
-            |- CMakeLists.txt
-            |- base.h
-            |- base.cpp
-            |- main.cpp
-        |- core
-        	|- CMakeLists.txt
-            |- main.cpp
-  	|- network
-  		|- tcp
-            |- CMakeLists.txt
-            |- main.cpp
+	|- base
+		|- string
+			|- CMakeLists.txt
+			|- base.h
+			|- base.cpp
+			|- main.cpp
+		|- core
+			|- CMakeLists.txt
+			|- main.cpp
+	|- network
+		|- tcp
+			|- CMakeLists.txt
+			|- main.cpp
 ```
 
 这个项目需要生成*Visual Studio*项目，`CMakeLists.txt`如下所示：
@@ -80,7 +80,7 @@ string(REGEX REPLACE ".*/(.*)" "\\1" SECOND_FOLDER ${SECOND_FOLDER_ABSOLUTE})
 
 ## `get_filename_component`
 
-这个命令就更好理解了**，把目录名当成文件名**就行了；
+这个命令就更好理解了，**把目录名当成文件名**就行了；
 
 获取当前目录名：
 
@@ -97,4 +97,4 @@ get_filename_component(SECOND_FOLDER ${SECOND_FOLDER_ABSOLUTE} NAME)
 
 ## 后记
 
-后续可能会讲一下图片这个项目的项目组织结构如何用CMake组织起来，这个项目是我的实验项目，里面有很多实验，还有考研机试的一些联系，因此里面超多的``target`。
+后续可能会讲一下图片这个项目的项目组织结构如何用CMake组织起来，这个项目是我的实验项目，里面有很多实验，还有考研机试的一些联系，因此里面超多的`target`。
