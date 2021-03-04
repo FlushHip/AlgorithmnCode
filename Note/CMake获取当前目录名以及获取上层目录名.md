@@ -97,4 +97,4 @@ get_filename_component(SECOND_FOLDER ${SECOND_FOLDER_ABSOLUTE} NAME)
 
 ## 后记
 
-后续可能会讲一下图片这个项目的项目组织结构如何用CMake组织起来，这个项目是我的实验项目，里面有很多实验，还有考研机试的一些联系，因此里面超多的`target`。
+后续可能会讲一下图片这个项目的项目组织结构如何用CMake组织起来，这个项目是我的实验项目，里面有很多实验，还有考研机试的一些练习，因此里面超多的`target`。
