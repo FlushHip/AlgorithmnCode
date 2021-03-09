@@ -22,10 +22,13 @@ target_link_options(${TARGET_NAME} PUBLIC $<$<PLATFORM_ID:Linux>:-m32>)
 简单粗暴一点就是：(不知道有没有啥副作用，反正官方是没有给出这种方式，纯属民间科学)
 
 ```cmake
-set(CMAKE_CXX_FLAGS -m32)
-set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -m32")
-set(CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_SHARED_LINKER_FLAGS} -m32")
-set(CMAKE_MODULE_LINKER_FLAGS  "${CMAKE_MODULE_LINKER_FLAGS} -m32")
+if (Linux)
+    # set(CMAKE_CXX_FLAGS -m32)
+    add_compile_options(-m32)
+    set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -m32")
+    set(CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_SHARED_LINKER_FLAGS} -m32")
+    set(CMAKE_MODULE_LINKER_FLAGS  "${CMAKE_MODULE_LINKER_FLAGS} -m32")
+endif()
 ```
 
 优雅点就是利用一个[Interface Libraries](https://cmake.org/cmake/help/v3.12/manual/cmake-buildsystem.7.html#id37)。
@@ -45,4 +48,8 @@ add_executable(main2 main2.cpp)
 target_link_libraries(main PRIVATE lib)
 # ...
 ```
+
+## 启发
+
+Linux上通过设置参数来达到修改对应配置，那么上述的*Interface Libraries + cmake-generator-expression*则可以应用在譬如设置其他编译选项（譬如`-std=c++17`，`-fPIC`等等）、头文件包含目录、库文件包含目录、编译宏定义等等。
 
