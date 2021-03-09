@@ -60,7 +60,9 @@ target_compile_options(${TARGET_NAME} PRIVATE $<IF:$<CXX_COMPILER_ID:MSVC>,/wd49
 这样就没啥问题了，如果你是使用CMake来生成Visual Studio的项目，然后调试是在Visual Studio中调试，然后你也想调试的时候重定向输入到文件，CMake可以设置Visual Studio的**调试输入参数**来避免在代码中加入无关代码。
 
 ```cmake
+# 不需要add_custom_command那一行了
+
 # 命令行的重定向输入
-set_target_properties(${TARGET_NAME} PROPERTIES VS_DEBUGGER_COMMAND_ARGUMENTS "< in.dat")
+set_target_properties(${TARGET_NAME} PROPERTIES VS_DEBUGGER_COMMAND_ARGUMENTS "< \"${CMAKE_CURRENT_SOURCE_DIR}/in.dat\"")
 ```
 
