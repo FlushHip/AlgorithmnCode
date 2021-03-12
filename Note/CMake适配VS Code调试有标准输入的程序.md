@@ -1,5 +1,11 @@
 本文的背景是使用[CMake Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools)来调试带有标准输入的程序，遇到的问题是CMake Tools目前不能提供一个额外的输入窗口来进行输入，这是目前这个插件的缺陷。
 
+------
+
+*PS*：Windows和MacOS下是有这个问题的，但是Linux下是不存在这个问题的，而Windows下通过阅读相关代码和文档已经解决，见[Windows下VS Code设置CMakeTools调试有输入的程序](https://flushhip.blog.csdn.net/article/details/114697132)，本文如下内容都是关于CMake的一些操作了。
+
+------
+
 目前我解决这个问题的方式是适用`freopen`来重定向输入到文件。利用条件编译在CMake中添加对应的宏。但是这样会在代码中引入一些不起作用的代码，不美观，不过也是没有办法的事。
 
 项目结构如下所示：
@@ -64,6 +70,14 @@ set_target_properties(${TARGET_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY $<
 
 所幸，可以通过`add_custom_command`、`add_custom_target`、`add_dependencies`联动来解决这个问题。不过就要额外引入一个*Utility*的Target。
 
+不过，这里要强调一点，CMakeTools在使用多配置工具集（例如Visual Studio的MSVC）时是不会传递`CMAKE_BUILD_TYPE`给到CMake的，因为这个变量只对单配置工具集有用，因此，我们需要在VS Code中对CMakeTools进行一项设置，令其无论如何都要（单配置工具集不需要添加，CMakeTools会自动传递）传递`CMAKE_BUILD_TYPE`，打开`settings.json`，添加如下JSON：
+
+```json
+    "cmake.configureArgs": [
+        "-DCMAKE_BUILD_TYPE=${buildType}"
+    ]
+```
+
 `CMakeLists.txt`：
 
 ```cmake
@@ -78,7 +92,7 @@ target_compile_definitions(${TARGET_NAME} PRIVATE VSCODE_CMAKE_TOOLS_DEBUG)
 
 set(OUTPUT_AUX_DIR ${CMAKE_CURRENT_BINARY_DIR})
 if (MSVC)
-    set(OUTPUT_DIR_AUX ${OUTPUT_AUX_DIR}/$<CONFIG>)
+    set(OUTPUT_AUX_DIR ${OUTPUT_AUX_DIR}/${CMAKE_BUILD_TYPE})
 endif ()
 
 add_custom_command(OUTPUT ${OUTPUT_AUX_DIR}/in.dat
