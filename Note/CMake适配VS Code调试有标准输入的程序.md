@@ -78,6 +78,16 @@ set_target_properties(${TARGET_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY $<
     ]
 ```
 
+------
+
+*PS*：后来发现CMakeTools有个专门的设置选项来解决这个问题，如下。
+
+```json
+    "cmake.setBuildTypeOnMultiConfig": true
+```
+
+------
+
 `CMakeLists.txt`：
 
 ```cmake
